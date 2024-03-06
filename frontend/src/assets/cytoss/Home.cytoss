@@ -1,0 +1,21 @@
+node {
+    label: data(name);
+    font-size: 14px;
+    text-wrap: wrap;
+    border-width: 0px;
+    text-valign: top;
+    text-halign: left;
+    width: 0.1;
+    height: 0.1;
+    background-color: data(bg);
+    text-background-color: blue;
+    text-margin-x: 60;
+}
+
+edge {
+    curve-style: bezier;
+    target-arrow-shape: triangle;
+    target-arrow-color: black;
+    line-color: black;
+    width: 2;
+}
