@@ -16,3 +16,5 @@ to this in your browser, and you can call your Go code from devtools.
 To build a redistributable, production mode package, use `wails build`.
 
 ## add https://nsis.sourceforge.io/AccessControl_plug-in dlls to nsis plugins directory to access installation directory
+
+## in powershell: wails build -nsis

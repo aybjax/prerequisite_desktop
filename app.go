@@ -48,7 +48,11 @@ func (a *App) OpenFiles() (string, error) {
 		return "", err
 	}
 
-	bs, err := json.Marshal(input.ToOutput())
+	output, err := input.ToOutput()
+	if err != nil {
+		return "", err
+	}
+	bs, err := json.Marshal(output)
 	if err != nil {
 		return "", err
 	}
@@ -81,8 +85,11 @@ type Edge struct {
 	Target string `json:"target,omitempty"`
 }
 
-type Output struct {
+type OutputNode struct {
 	Data Node `json:"data"`
+}
+type OutputEdge struct {
+	Data NodeEdge `json:"data"`
 }
 type Node struct {
 	Id     string `json:"id"`
@@ -91,16 +98,21 @@ type Node struct {
 	Color  string `json:"color"`
 	Group  string `json:"group"`
 	Parent string `json:"parent"`
-	//
+}
+type NodeEdge struct {
+	Id     string `json:"id"`
 	Source string `json:"source,omitempty"`
 	Target string `json:"target,omitempty"`
 }
 
-func (i Input) ToOutput() []*Output {
-	var outputs []*Output
+func (i Input) ToOutput() ([]any, error) {
+	var outputs []any
+	exists := map[string]struct{}{}
 
 	for _, unit := range i.Units {
-		var output Output
+		exists[unit.Id] = struct{}{}
+
+		var output OutputNode
 
 		output.Data.Group = "units"
 		output.Data.Bg = "rgb(255, 172, 48)"
@@ -112,7 +124,16 @@ func (i Input) ToOutput() []*Output {
 	}
 
 	for _, topic := range i.Topics {
-		var output Output
+		if topic.Parent == "" {
+			return nil, fmt.Errorf("topic(%s) has no parent", topic.Id)
+		}
+		if _, ok := exists[topic.Parent]; !ok {
+			return nil, fmt.Errorf("topic(%s)'s parent does not exists (%s)", topic.Id, topic.Parent)
+		}
+
+		exists[topic.Id] = struct{}{}
+
+		var output OutputNode
 
 		output.Data.Group = "topics"
 		output.Data.Bg = "rgb(252, 245, 235)"
@@ -125,8 +146,17 @@ func (i Input) ToOutput() []*Output {
 	}
 
 	for _, microtopic := range i.Microtopics {
-		var container Output
-		var data Output
+		if microtopic.Parent == "" {
+			return nil, fmt.Errorf("microtopic(%s) has no parent", microtopic.Id)
+		}
+		if _, ok := exists[microtopic.Parent]; !ok {
+			return nil, fmt.Errorf("microtopic(%s)'s parent does not exists (%s)", microtopic.Id, microtopic.Parent)
+		}
+
+		exists[microtopic.Id] = struct{}{}
+
+		var container OutputNode
+		var data OutputNode
 
 		container.Data.Group = "microtopic_container"
 		container.Data.Bg = "rgb(164, 233, 133)"
@@ -146,14 +176,20 @@ func (i Input) ToOutput() []*Output {
 	}
 
 	for _, edge := range i.Edges {
-		var data Output
+		if _, ok := exists[edge.Source]; !ok {
+			return nil, fmt.Errorf("microtopic(%s) does not exists for edge", edge.Source)
+		} else if _, ok := exists[edge.Target]; !ok {
+			return nil, fmt.Errorf("microtopic(%s) does not exists for edge", edge.Target)
+		}
+
+		var data OutputEdge
 
 		data.Data.Source = edge.Source
 		data.Data.Target = edge.Target
-		data.Data.Id = fmt.Sprint(rand.Int())
+		data.Data.Id = fmt.Sprintf("%d-%d", rand.Int(), rand.Int())
 
 		outputs = append(outputs, &data)
 	}
 
-	return outputs
+	return outputs, nil
 }

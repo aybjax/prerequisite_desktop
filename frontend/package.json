@@ -10,6 +10,10 @@
     "check": "svelte-check --tsconfig ./tsconfig.json"
   },
   "devDependencies": {
+    "@mdi/js": "^7.4.47",
+    "@smui/button": "^7.0.0-beta.16",
+    "@smui/icon-button": "^7.0.0-beta.16",
+    "@smui/tooltip": "^7.0.0-beta.16",
     "@sveltejs/vite-plugin-svelte": "^1.0.1",
     "@tsconfig/svelte": "^3.0.0",
     "@types/cytoscape": "^3.19.16",
@@ -22,9 +26,11 @@
     "vite": "^3.0.7"
   },
   "dependencies": {
+    "@smui/snackbar": "^7.0.0-beta.16",
     "cytoscape": "^3.28.1",
     "cytoscape-dagre": "^2.5.0",
     "cytoscape-klay": "^3.1.4",
+    "svelte-material-ui": "^7.0.0-beta.16",
     "svelte-spa-router": "^4.0.1",
     "uuidjs": "^5.0.1"
   }

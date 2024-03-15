@@ -1,14 +1,21 @@
 <script lang="ts">
     // @ts-ignore
     import cytoscape from 'cytoscape';
-    import dagre from 'cytoscape-dagre';
+    // import dagre from 'cytoscape-dagre';
     import klay from 'cytoscape-klay';
     import { onMount } from "svelte";
     import {OpenFiles} from '../../wailsjs/go/main/App'
+    import Tooltip, { Wrapper }  from '@smui/tooltip'
+    import IconButton, { Icon } from '@smui/icon-button';
+    import { mdiDownload } from '@mdi/js';
+    import Snackbar, { Label as SnackLabel, Actions } from '@smui/snackbar';
+    
  
     // cytoscape.use(dagre)
     cytoscape.use(klay)
-    // let container: HTMLDivElement;
+    let container: HTMLDivElement;
+    let errorSnackbar: Snackbar;
+    let errorMsg = ''
     let cy: cytoscape.Core
 
     onMount(() => {
@@ -17,9 +24,8 @@
 
     function createCytoscape(elements: string = '[]'): cytoscape.Core {
         cy?.destroy()
-        debugger
         return cytoscape({
-            container: document.getElementById('container'),
+            container: container,
 
             elements: JSON.parse(elements),
         
@@ -99,44 +105,82 @@
                         "background-color": 'data(bg)',
                         "text-background-color": "blue",
                         'text-margin-x': 60,
-                    }
+                    },
                 },
                 {
                     "selector": "edge",
                     "style": {
-                        'curve-style': 'bezier',
-                        'target-arrow-shape': 'circle-triangle',
+                        'curve-style': 'segments',
+                        'target-arrow-shape': 'triangle',
                         'target-arrow-color': 'black',
                         'line-color': 'black',
-                        'width': 2,
+                        'width': 1,
                     }
                 }
             ],
         });
     }
     async function a() {
-        const content = await OpenFiles();
+        let content = '[]'
+        try {
+            content = await OpenFiles();
+        } catch(e) {
+            errorMsg = e
+            errorSnackbar.open()
+        }
         createCytoscape(content)
     }
 </script>
 
-<div>
+<div class="aybjax">
     <div class="input--button">
-        <button class="input--button" on:click={a}>upload</button>
+        <!-- <button class="input--button" on:click={a}>upload</button> -->
+        <Wrapper>
+            <IconButton class="material-icons"  on:click={a}>
+                <Icon tag="svg" viewBox="0 0 24 24">
+                    <path fill="currentColor" d={mdiDownload} />
+                </Icon>
+            </IconButton>
+            <Tooltip unbounded>Загрузить данные для отображения</Tooltip>
+        </Wrapper>
+         
+        <Snackbar bind:this={errorSnackbar} class="demo-error">
+            <SnackLabel>
+                {errorMsg}
+            </SnackLabel>
+            <Actions>
+                <IconButton class="material-icons" title="Dismiss">close</IconButton>
+            </Actions>
+        </Snackbar>
     </div>
-    <div id="container"></div>
+    <div id="container" bind:this={container}></div>
 </div>
 
-<style>
-    #container {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 50;
+<style lang="scss">
+    // See https://github.com/material-components/material-components-web/tree/v14.0.0/packages/mdc-theme
+    @use '../../node_modules/@material/theme/color-palette';
+    @use '../../node_modules/@material/theme/theme-color';
+    // Make sure SMUI's import happens first, since it specifies variables.
+    @use '../../node_modules/@smui/snackbar/style' as smui-snackabar;
+    // See https://github.com/material-components/material-components-web/tree/v14.0.0/packages/mdc-snackbar
+    @use '../../node_modules/@material/snackbar/mixins' as snackbar;
+    
+    .aybjax {
+        #container {
+                position: fixed;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 50;
+        }
     }
-
+    .mdc-snackbar.demo-error {
+        @include snackbar.fill-color(color-palette.$red-500);
+        @include snackbar.label-ink-color(
+            theme-color.accessible-ink-color(color-palette.$red-500)
+        );
+    }
     .input--button {
         position: fixed;
         z-index: 999;
