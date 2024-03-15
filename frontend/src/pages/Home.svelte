@@ -30,14 +30,6 @@
             elements: JSON.parse(elements),
         
             layout: {
-                // name: 'dagre',
-                // animate: true,
-                // nodeDimensionsIncludeLabels: true,
-                // idealEdgeLength: 20,
-                // align: 'UL',
-                // rankDir: 'TB',
-                //
-                
                 name: 'klay',
                 animate: true,
                 nodeDimensionsIncludeLabels: true,
@@ -99,7 +91,7 @@
                         'text-wrap': 'wrap',
                         'border-width': '0px',
                         "text-valign": "top",
-                        "text-halign": "left",
+                        // "text-halign": "left",
                         "width": 0.1,
                         "height": 0.1,
                         "background-color": 'data(bg)',
@@ -110,7 +102,7 @@
                 {
                     "selector": "edge",
                     "style": {
-                        'curve-style': 'segments',
+                        'curve-style': 'straight',
                         'target-arrow-shape': 'triangle',
                         'target-arrow-color': 'black',
                         'line-color': 'black',
@@ -121,12 +113,12 @@
         });
     }
     async function a() {
-        let content = '[]'
+        let content = '[]';
         try {
             content = await OpenFiles();
         } catch(e) {
-            errorMsg = e
-            errorSnackbar.open()
+            errorMsg = e;
+            errorSnackbar.open();
         }
         createCytoscape(content)
     }
