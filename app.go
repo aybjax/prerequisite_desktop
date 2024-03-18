@@ -155,23 +155,25 @@ func (i Input) ToOutput() ([]any, error) {
 
 		//exists[microtopic.Id] = struct{}{}
 
-		var container OutputNode
+		// var container OutputNode
 		var data OutputNode
 
-		container.Data.Group = "microtopic_container"
-		container.Data.Bg = "rgb(164, 233, 133)"
-		container.Data.Id = microtopic.Id
-		//container.Data.Color = "white"
-		container.Data.Parent = microtopic.Parent
+		// container.Data.Group = "microtopic_container"
+		// container.Data.Bg = "rgb(164, 233, 133)"
+		// container.Data.Id = microtopic.Id
+		// //container.Data.Color = "white"
+		// container.Data.Parent = microtopic.Parent
 
 		data.Data.Group = "microtopics"
 		//data.Data.Bg = "rgb(164, 233, 133)"
-		data.Data.Name = microtopic.Name
-		data.Data.Id = microtopic.Id + "_data"
+		// data.Data.Name = microtopic.Name
+		data.Data.Name = microtopic.Id
+		// data.Data.Id = microtopic.Id + "_data"
+		data.Data.Id = microtopic.Id
 		data.Data.Color = "white"
 		data.Data.Parent = microtopic.Id
 
-		outputs = append(outputs, &container)
+		// outputs = append(outputs, &container)
 		outputs = append(outputs, &data)
 	}
 
